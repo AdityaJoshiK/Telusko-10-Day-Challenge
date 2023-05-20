@@ -4,7 +4,7 @@ public class Factorial_Iterative {
     {
         int ans=1;
 
-        for (int i = n; i >=1; i--) {
+        for (int i = 1;i<=n;i++) {
             ans = ans * i;
         }
 
