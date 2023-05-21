@@ -32,7 +32,12 @@ public class Main {
         // Product p = service.getProduct("Apple Mouse");
         // System.out.println(p);
 
-        products = service.getProductWithText("black");
+        // products = service.getProductWithText("black");
+        // for (Product product : products) {
+        //     System.out.println(product);
+        // }
+
+        products= service.getOutOfWarranty();
         for (Product product : products) {
             System.out.println(product);
         }
