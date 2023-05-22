@@ -1,9 +1,10 @@
 package com.product;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         ProductService service = new ProductService();
 
         service.addProduct(new Product("Type C", "Cable", "Black Drawer", 2024));
@@ -29,8 +30,8 @@ public class Main {
         //     System.out.println(product);
         // }
 
-        // Product p = service.getProduct("Apple Mouse");
-        // System.out.println(p);
+        Product p = service.getProduct("Apple Mouse");
+        System.out.println(p);
 
         // products = service.getProductWithText("black");
         // for (Product product : products) {

@@ -1,5 +1,6 @@
 package com.product;
 
+import java.sql.SQLException;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,14 +9,16 @@ import java.util.stream.Collectors;
 public class ProductService {
     
     List<Product> products = new ArrayList<>();
+    ProductDB db = new ProductDB();
 
-    public void addProduct(Product p) {
-        products.add(p);
+    public void addProduct(Product p) throws SQLException {
+        // products.add(p);
+        db.save(p);
     }
 
-    public List<Product> getAllProducts()
+    public List<Product> getAllProducts() throws SQLException
     {
-        return products;
+        return db.getAll();
     }
 
     /*Assignment 1-Search By Place */
@@ -41,13 +44,12 @@ public class ProductService {
 
     }
 
-    public Product getProduct(String name) {
-        for (Product p : products) {
-			if (p.getName().equals(name))
-				return p;
-		}
+    /*Assignment 1 - get Product From DB */
+    public Product getProduct(String name) throws SQLException {
+        Product p = db.getProduct(name);
 
-		return null;
+        return p;
+        
 }
 
 
