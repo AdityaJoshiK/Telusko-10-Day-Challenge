@@ -1,8 +1,10 @@
 {
     "java.project.sourcePaths": [
+        "Day 2/demo/src/main/java/com/product",
         "Day 1/Learning",
         "Day 1/Assignment",
-        "Day 2/demo/src/main/java/com/product"
+        "Day 3/productspring/src/main/java/com/product/productspring"
     ],
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic"
 }
