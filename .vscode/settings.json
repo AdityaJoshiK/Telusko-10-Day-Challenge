@@ -1,11 +1,12 @@
 {
     "java.project.sourcePaths": [
+        "Day 5/ReflectionApi/src",
         "Day 4/productspringweb/src/main/java/com/productspringweb/productspringweb",
         "Day 3/productspring/src/main/java/com/product/productspring",
         "Day 2/demo/src/main/java/com/product",
         "Day 1/Learning",
         "Day 1/Assignment",
-        "Day 5/ReflectionApi/src"
+        "Day 6"
     ],
     "java.configuration.updateBuildConfiguration": "interactive",
     "java.compile.nullAnalysis.mode": "automatic"
