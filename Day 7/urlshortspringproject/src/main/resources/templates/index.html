@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>URL Shortener</title>
+</head>
+<body>
+    <h1>URL Shortener</h1>
+    <form id="urlForm">
+        <label for="longUrlInput">Long URL:</label>
+        <input type="text" id="longUrlInput" name="longUrl" required>
+        <button type="submit">Generate Short URL</button>
+    </form>
+    <div id="shortUrlContainer"></div>
+
+    <script>
+        document.getElementById("urlForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            generateShortURL();
+        });
+
+        function generateShortURL() {
+            var longURL = document.getElementById("longUrlInput").value;
+            fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'longURL=' + encodeURIComponent(longURL)
+            })
+            .then(response => response.text())
+            .then(shortURL => {
+                document.getElementById("shortUrlContainer").innerHTML = "Short URL: " + shortURL;
+            });
+        }
+    </script>
+</body>
+</html>
