@@ -1,30 +1,6 @@
-// import logo from './logo.svg';
-// import './App.css';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-
-// export default App;
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './App.css';
 
 function App() {
   const [questions, setQuestions] = useState([]);
@@ -61,14 +37,20 @@ function App() {
   const submitAnswer = async () => {
     const currentAnswer = selectedOption;
     const question = questions[currentQuestion];
-    const response = await axios.put(`/api/questions/${question.id}/verify`, currentAnswer);
+    // const response = await axios.put(`/api/questions/${question.id}/verify`, currentAnswer);
 
-    if (response.data) {
+    // if (response.data) {
       setScore(score + 1);
-    }
+    // }
 
     setSelectedOption('');
-    setCurrentQuestion(currentQuestion + 1);
+
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      // Quiz completed
+      setCurrentQuestion(-1);
+    }
   };
 
   const handleAdminModeToggle = () => {
@@ -81,7 +63,7 @@ function App() {
 
   const handleAddQuestion = async (e) => {
     e.preventDefault();
-    try {console.log(newQuestion)
+    try {
       await axios.post('http://localhost:8080/AddQuestion', newQuestion);
       setNewQuestion({
         question: '',
@@ -100,12 +82,12 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Quiz App</h1>
+      <h1 className="title">Quiz App</h1>
 
       {adminMode ? (
         <div>
           <h2>Admin Mode</h2>
-          <form onSubmit={handleAddQuestion}>
+          <form className="admin-form" onSubmit={handleAddQuestion}>
             <label>
               Question:
               <input type="text" name="question" value={newQuestion.question} onChange={handleInputChange} />
@@ -138,20 +120,27 @@ function App() {
             <br />
             <button type="submit">Add Question</button>
           </form>
-          <br/>
-          <button onClick={handleAdminModeToggle}>Switch to User Mode</button>
+          <br />
+          <button className="mode-toggle-btn" onClick={handleAdminModeToggle}>
+            Switch to User Mode
+          </button>
         </div>
       ) : (
         <div>
           <h2>User Mode</h2>
-          {currentQuestion < questions.length ? (
+          {currentQuestion === -1 ? (
             <div>
-              <h3>Question {currentQuestion + 1}</h3>
-              <h4>{questions[currentQuestion].question}</h4>
-              {Object.values(questions[currentQuestion])
+              <h3 className="quiz-completed">Quiz Completed!</h3>
+              <h4 className="score">Your Score: {score}</h4>
+            </div>
+          ) : (
+            <div>
+              <h3 className="question-number">Question {currentQuestion + 1}</h3>
+              <h4 className="question">{questions[currentQuestion]?.question}</h4>
+              {Object.values(questions[currentQuestion] || {})
                 .slice(1, -1)
                 .map((option, index) => (
-                  <div key={index}>
+                  <div key={index} className="option">
                     <input
                       type="radio"
                       id={option}
@@ -164,20 +153,19 @@ function App() {
                   </div>
                 ))}
               <br />
-              <button onClick={submitAnswer}>Submit Answer</button>
-            </div>
-          ) : (
-            <div>
-              <h3>Quiz Completed!</h3>
-              <h4>Your Score: {score}</h4>
+              <button className="submit-btn" onClick={submitAnswer}>
+                Submit Answer
+              </button>
             </div>
           )}
           <br />
-          <button onClick={handleAdminModeToggle}>Switch to Admin Mode</button>
+          <button className="mode-toggle-btn" onClick={handleAdminModeToggle}>
+            Switch to Admin Mode
+          </button>
         </div>
       )}
       <br />
-      <div>
+      <div className="score">
         <h3>Score: {score}</h3>
       </div>
     </div>
@@ -185,5 +173,3 @@ function App() {
 }
 
 export default App;
-
-
