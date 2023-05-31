@@ -1,36 +1,38 @@
 package com.quiz.quizbackend;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OrderColumn;
+import jakarta.persistence.JoinColumn;
 import lombok.Data;
 
-@Data
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.JoinColumns;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 @Entity
+@Data
 public class Quiz {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private String question;
-    private String option1;
-    private String option2;
-    private String option3;
-    private String option4;
-    private String technology;
+    private Long id;
 
-    public Quiz()
-    {
-        
-    }
+    private String name;
 
-    public Quiz(String question, String option1, String option2, String option3, String option4, String technology)
-    {
-        this.question = question;
-        this.option1 = option1;
-        this.option2 = option2;
-        this.option3 = option3;
-        this.option4 = option4;
-        this.technology = technology;
-    }
+    @ElementCollection
+    @CollectionTable(name = "quiz_questions", joinColumns = @JoinColumn(name = "quiz_id"))
+    @Column(name = "question_id")
+    @OrderColumn(name = "question_order")
+    private List<Long> questionIds;
+
+    // constructors, getters, setters
 }

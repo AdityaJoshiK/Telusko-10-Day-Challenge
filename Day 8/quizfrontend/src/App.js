@@ -4,6 +4,7 @@ import './App.css';
 
 function App() {
   const [questions, setQuestions] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
   const [score, setScore] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState('');
@@ -16,15 +17,30 @@ function App() {
     option4: '',
     technology: '',
   });
+  const [newQuiz, setNewQuiz] = useState({
+    name: '',
+    questions: [],
+  });
 
   useEffect(() => {
     fetchQuestions();
+    fetchQuizzes();
   }, []);
 
   const fetchQuestions = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/All');
+      const response = await axios.get('http://localhost:8080/questions');
+      console.log(response.data);
       setQuestions(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchQuizzes = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/quizzes');
+      setQuizzes(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -64,7 +80,7 @@ function App() {
   const handleAddQuestion = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8080/AddQuestion', newQuestion);
+      await axios.post('http://localhost:8080/questions', newQuestion);
       setNewQuestion({
         question: '',
         option1: '',
@@ -74,9 +90,40 @@ function App() {
         technology: '',
       });
       alert('Question added successfully!');
+      fetchQuestions();
     } catch (error) {
       console.log(error);
       alert('Failed to add the question.');
+    }
+  };
+
+  const handleQuizNameChange = (e) => {
+    setNewQuiz({ ...newQuiz, name: e.target.value });
+  };
+
+  const handleQuestionSelection = (questionId) => {
+    const selectedQuestions = newQuiz.questions;
+    if (selectedQuestions.includes(questionId)) {
+      const updatedQuestions = selectedQuestions.filter((q) => q !== questionId);
+      setNewQuiz({ ...newQuiz, questions: updatedQuestions });
+    } else {
+      setNewQuiz({ ...newQuiz, questions: [...selectedQuestions, questionId] });
+    }
+  };
+
+  const handleQuizCreation = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:8080/quizzes', newQuiz);
+      setNewQuiz({
+        name: '',
+        questions: [],
+      });
+      alert('Quiz created successfully!');
+      fetchQuizzes();
+    } catch (error) {
+      console.log(error);
+      alert('Failed to create the quiz.');
     }
   };
 
@@ -87,39 +134,78 @@ function App() {
       {adminMode ? (
         <div>
           <h2>Admin Mode</h2>
-          <form className="admin-form" onSubmit={handleAddQuestion}>
-            <label>
-              Question:
-              <input type="text" name="question" value={newQuestion.question} onChange={handleInputChange} />
-            </label>
-            <br />
-            <label>
-              Option 1:
-              <input type="text" name="option1" value={newQuestion.option1} onChange={handleInputChange} />
-            </label>
-            <br />
-            <label>
-              Option 2:
-              <input type="text" name="option2" value={newQuestion.option2} onChange={handleInputChange} />
-            </label>
-            <br />
-            <label>
-              Option 3:
-              <input type="text" name="option3" value={newQuestion.option3} onChange={handleInputChange} />
-            </label>
-            <br />
-            <label>
-              Option 4:
-              <input type="text" name="option4" value={newQuestion.option4} onChange={handleInputChange} />
-            </label>
-            <br />
-            <label>
-              Technology:
-              <input type="text" name="technology" value={newQuestion.technology} onChange={handleInputChange} />
-            </label>
-            <br />
-            <button type="submit">Add Question</button>
-          </form>
+          <nav>
+            <ul>
+              <li>
+                <button>Questions</button>
+              </li>
+              <li>
+                <button>Quizzes</button>
+              </li>
+            </ul>
+          </nav>
+          <div>
+            <h3>Add Question</h3>
+            <form className="admin-form" onSubmit={handleAddQuestion}>
+              <label>
+                Question:
+                <input type="text" name="question" value={newQuestion.question} onChange={handleInputChange} />
+              </label>
+              <br />
+              <label>
+                Option 1:
+                <input type="text" name="option1" value={newQuestion.option1} onChange={handleInputChange} />
+              </label>
+              <br />
+              <label>
+                Option 2:
+                <input type="text" name="option2" value={newQuestion.option2} onChange={handleInputChange} />
+              </label>
+              <br />
+              <label>
+                Option 3:
+                <input type="text" name="option3" value={newQuestion.option3} onChange={handleInputChange} />
+              </label>
+              <br />
+              <label>
+                Option 4:
+                <input type="text" name="option4" value={newQuestion.option4} onChange={handleInputChange} />
+              </label>
+              <br />
+              <label>
+                Technology:
+                <input type="text" name="technology" value={newQuestion.technology} onChange={handleInputChange} />
+              </label>
+              <br />
+              <button type="submit">Add Question</button>
+            </form>
+          </div>
+          <div>
+            <h3>Create Quiz</h3>
+            <form className="admin-form" onSubmit={handleQuizCreation}>
+              <label>
+                Quiz Name:
+                <input type="text" name="name" value={newQuiz.name} onChange={handleQuizNameChange} />
+              </label>
+              <br />
+              <label>Questions:</label>
+              {questions.map((question) => (
+                <div key={question.id}>
+                  <input
+                    type="checkbox"
+                    id={question.id}
+                    name="questions"
+                    value={question.id}
+                    checked={newQuiz.questions.includes(question.id)}
+                    onChange={() => handleQuestionSelection(question.id)}
+                  />
+                  <label htmlFor={question.id}>{question.question}</label>
+                </div>
+              ))}
+              <br />
+              <button type="submit">Create Quiz</button>
+            </form>
+          </div>
           <br />
           <button className="mode-toggle-btn" onClick={handleAdminModeToggle}>
             Switch to User Mode
