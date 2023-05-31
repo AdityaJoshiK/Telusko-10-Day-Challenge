@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz Game</title>
+  <style>
+    /* CSS styles for the quiz game */
+    /* ... */
+  </style>
+</head>
+<body>
+  <!-- HTML structure for the quiz game -->
+  <div id="start-container">
+    <h1>Welcome to the Quiz Game</h1>
+    <button id="start-button">Start</button>
+  </div>
+
+  <div id="quiz-container" style="display: none;">
+    <h2 id="question-number"></h2>
+    <h3 id="question"></h3>
+    <ul id="options-list"></ul>
+    <button id="next-button">Next</button>
+  </div>
+
+  <div id="score-modal" style="display: none;">
+    <h1>Quiz Game Results</h1>
+    <h2 id="remarks"></h2>
+    <h3>Grade: <span id="grade-percentage"></span>%</h3>
+    <h3>Correct Answers: <span id="right-answers"></span></h3>
+    <h3>Wrong Answers: <span id="wrong-answers"></span></h3>
+    <button id="play-again-button">Play Again</button>
+  </div>
+
+  <div id="option-modal" style="display: none;">
+    <h2>Please select an option.</h2>
+    <button id="close-modal-button">Close</button>
+  </div>
+
+  <script>
+    // JavaScript code for the quiz game
+    const startContainer = document.getElementById('start-container');
+    const startButton = document.getElementById('start-button');
+    const quizContainer = document.getElementById('quiz-container');
+    const questionNumber = document.getElementById('question-number');
+    const question = document.getElementById('question');
+    const optionsList = document.getElementById('options-list');
+    const nextButton = document.getElementById('next-button');
+    const scoreModal = document.getElementById('score-modal');
+    const remarks = document.getElementById('remarks');
+    const gradePercentage = document.getElementById('grade-percentage');
+    const rightAnswers = document.getElementById('right-answers');
+    const wrongAnswers = document.getElementById('wrong-answers');
+    const playAgainButton = document.getElementById('play-again-button');
+    const optionModal = document.getElementById('option-modal');
+    const closeModalButton = document.getElementById('close-modal-button');
+
+    let currentQuestion = 0;
+    let score = 0;
+    let selectedOption = false;
+    let userAnswers = [];
+
+    async function fetchQuestions() {
+      try {
+        const response = await fetch('http://localhost:8080/All');
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.log('Error fetching questions:', error);
+      }
+    }
+
+    function startQuiz() {
+      startContainer.style.display = 'none';
+      quizContainer.style.display = 'block';
+      loadQuestion();
+    }
+
+    async function loadQuestion() {
+      const questions = await fetchQuestions();
+      if (currentQuestion < questions.length) {
+        resetOptions();
+        const currentQuestionData = questions[currentQuestion];
+        questionNumber.innerText = `Question ${currentQuestion + 1}`;
+        question.innerText = currentQuestionData.question;
+        optionsList.innerHTML = '';
+        currentQuestionData.options.forEach((option, index) => {
+          const li = document.createElement('li');
+          const input = document.createElement('input');
+          input.type = 'radio';
+          input.name = 'option';
+          input.id = `option-${index + 1}`;
+          input.value = index;
+          const label = document.createElement('label');
+          label.htmlFor = `option-${index + 1}`;
+          label.innerText = option;
+          li.appendChild(input);
+          li.appendChild(label);
+          optionsList.appendChild(li);
+        });
+      } else {
+        showScore();
+      }
+    }
+
+    function resetOptions() {
+      const options = document.querySelectorAll('input[name="option"]');
+      options.forEach(option => {
+        option.checked = false;
+      });
+      selectedOption = false;
+    }
+
+    function checkAnswer() {
+      const options = document.querySelectorAll('input[name="option"]');
+      let userAnswer = -1;
+
+      options.forEach((option, index) => {
+        if (option.checked) {
+          userAnswer = index;
+        }
+      });
+
+      if (userAnswer === -1) {
+        showOptionModal();
+      } else {
+        const questions = fetchQuestions();
+        questions.then(data => {
+          const currentQuestionData = data[currentQuestion];
+          userAnswers.push(userAnswer);
+          if (userAnswer === currentQuestionData.answer) {
+            score++;
+          }
+          currentQuestion++;
+          loadQuestion();
+        });
+      }
+    }
+
+    function showOptionModal() {
+      optionModal.style.display = 'block';
+    }
+
+    function closeOptionModal() {
+      optionModal.style.display = 'none';
+    }
+
+    function showScore() {
+      quizContainer.style.display = 'none';
+      scoreModal.style.display = 'block';
+
+      const percentage = (score / currentQuestion) * 100;
+      gradePercentage.innerText = percentage.toFixed(2);
+      rightAnswers.innerText = score;
+      wrongAnswers.innerText = currentQuestion - score;
+
+      if (percentage >= 70) {
+        remarks.innerText = 'Congratulations! You passed the quiz.';
+      } else {
+        remarks.innerText = 'Sorry! You did not pass the quiz.';
+      }
+    }
+
+    function resetQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      userAnswers = [];
+      startContainer.style.display = 'block';
+      scoreModal.style.display = 'none';
+    }
+
+    // Event listeners
+    startButton.addEventListener('click', startQuiz);
+    nextButton.addEventListener('click', checkAnswer);
+    playAgainButton.addEventListener('click', resetQuiz);
+    closeModalButton.addEventListener('click', closeOptionModal);
+  </script>
+</body>
+</html>
